@@ -1,0 +1,342 @@
+{% extends 'detection_app/base.html' %}
+
+{% block title %}Admin Dashboard - Fake Profile Detection{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<section class="py-4 bg-dark text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="display-6 fw-bold mb-0">
+                    <i class="fas fa-tachometer-alt me-3"></i>Admin Dashboard
+                </h1>
+                <p class="mb-0">Monitor fake profile detection system performance and analytics</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'detection_app:index' %}" class="btn btn-light btn-custom">
+                    <i class="fas fa-plus me-2"></i>New Analysis
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Cards -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="card stats-card text-center">
+                    <div class="card-body">
+                        <h3 class="text-white">{{ total_profiles }}</h3>
+                        <p class="mb-0 text-white">Total Profiles</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card text-center" style="background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: white;">
+                    <div class="card-body">
+                        <h3 class="text-white">{{ fake_profiles }}</h3>
+                        <p class="mb-0 text-white">Fake Profiles</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card text-center" style="background: linear-gradient(135deg, #2ecc71, #27ae60); color: white;">
+                    <div class="card-body">
+                        <h3 class="text-white">{{ genuine_profiles }}</h3>
+                        <p class="mb-0 text-white">Genuine Profiles</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card text-center" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white;">
+                    <div class="card-body">
+                        <h3 class="text-white">{{ fake_percentage|floatformat:1 }}%</h3>
+                        <p class="mb-0 text-white">Fake Rate</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts Row -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-line me-2"></i>Detection Trends (Last 30 Days)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="trendsChart" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-pie-chart me-2"></i>Detection Distribution
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Model Performance -->
+        {% if latest_metrics %}
+        <div class="row g-4 mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-robot me-2"></i>Model Performance Metrics
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <h4 class="text-primary">{{ latest_metrics.accuracy|floatformat:3 }}</h4>
+                                <p class="mb-0">Accuracy</p>
+                            </div>
+                            <div class="col-md-3">
+                                <h4 class="text-success">{{ latest_metrics.precision|floatformat:3 }}</h4>
+                                <p class="mb-0">Precision</p>
+                            </div>
+                            <div class="col-md-3">
+                                <h4 class="text-warning">{{ latest_metrics.recall|floatformat:3 }}</h4>
+                                <p class="mb-0">Recall</p>
+                            </div>
+                            <div class="col-md-3">
+                                <h4 class="text-info">{{ latest_metrics.f1_score|floatformat:3 }}</h4>
+                                <p class="mb-0">F1 Score</p>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>
+                                Last trained: {{ latest_metrics.training_date|date:"M d, Y H:i" }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Recent Detections and Flagged Profiles -->
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-history me-2"></i>Recent Detections
+                        </h5>
+                        <a href="/admin/detection_app/detectionresult/" class="btn btn-sm btn-light">View All</a>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if recent_detections %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Profile</th>
+                                        <th>Result</th>
+                                        <th>Confidence</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for detection in recent_detections %}
+                                    <tr>
+                                        <td>
+                                            <div>
+                                                <strong>{{ detection.profile.bio|truncatewords:5 }}</strong>
+                                                <br>
+                                                <small class="text-muted">
+                                                    {{ detection.profile.friends_count }} friends, 
+                                                    {{ detection.profile.posts_per_week }} posts/week
+                                                </small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if detection.is_fake %}
+                                                <span class="badge bg-danger">Fake</span>
+                                            {% else %}
+                                                <span class="badge bg-success">Genuine</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="progress" style="width: 80px; height: 20px;">
+                                                <div class="progress-bar {% if detection.is_fake %}bg-danger{% else %}bg-success{% endif %}" 
+                                                     style="width: {{ detection.confidence_score|floatformat:0 }}%">
+                                                    {{ detection.confidence_score|floatformat:1 }}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <small>{{ detection.created_at|date:"M d, H:i" }}</small>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'detection_app:result' detection.profile.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'detection_app:flag_profile' detection.profile.id %}" class="btn btn-sm btn-outline-warning">
+                                                <i class="fas fa-flag"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No recent detections found.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">
+                            <i class="fas fa-flag me-2"></i>Flagged Profiles
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if flagged_profiles %}
+                        {% for flag in flagged_profiles %}
+                        <div class="border-bottom pb-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ flag.profile.bio|truncatewords:8 }}</h6>
+                                    <p class="text-muted small mb-2">{{ flag.reason|truncatewords:10 }}</p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ flag.created_at|timesince }} ago
+                                    </small>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="{% url 'detection_app:resolve_flag' flag.id 'confirmed' %}">Confirm Fake</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'detection_app:resolve_flag' flag.id 'false_positive' %}">False Positive</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'detection_app:resolve_flag' flag.id 'resolved' %}">Resolve</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-flag fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No flagged profiles.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Trends Chart
+        const trendsCtx = document.getElementById('trendsChart').getContext('2d');
+        const trendsData = {{ daily_stats|safe }};
+        
+        new Chart(trendsCtx, {
+            type: 'line',
+            data: {
+                labels: trendsData.map(item => item.date),
+                datasets: [{
+                    label: 'Total Detections',
+                    data: trendsData.map(item => item.total),
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'Fake Profiles',
+                    data: trendsData.map(item => item.fake),
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'Genuine Profiles',
+                    data: trendsData.map(item => item.genuine),
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                }
+            }
+        });
+        
+        // Distribution Chart
+        const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+        new Chart(distributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Genuine', 'Fake'],
+                datasets: [{
+                    data: [{{ genuine_profiles }}, {{ fake_profiles }}],
+                    backgroundColor: ['#28a745', '#dc3545'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+        
+        // Auto-refresh data every 30 seconds
+        setInterval(function() {
+            fetch('{% url "detection_app:analytics_api" %}')
+                .then(response => response.json())
+                .then(data => {
+                    // Update statistics if needed
+                    console.log('Data refreshed');
+                })
+                .catch(error => console.error('Error refreshing data:', error));
+        }, 30000);
+    });
+</script>
+{% endblock %}

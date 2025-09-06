@@ -1,0 +1,85 @@
+{% extends 'detection_app/base.html' %}
+
+{% block title %}Flag Profile - Fake Profile Detection{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h3 class="mb-0">
+                            <i class="fas fa-flag me-2"></i>Flag Profile for Review
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Profile Preview -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Profile Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Bio Text</h6>
+                                        <p class="mb-3">{{ profile.bio }}</p>
+                                        
+                                        <h6 class="text-muted">Friends Count</h6>
+                                        <p class="mb-3">{{ profile.friends_count }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Posts per Week</h6>
+                                        <p class="mb-3">{{ profile.posts_per_week }}</p>
+                                        
+                                        <h6 class="text-muted">Account Age</h6>
+                                        <p class="mb-3">{{ profile.account_age_days }} days</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Flag Form -->
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <div class="mb-4">
+                                <label for="{{ form.reason.id_for_label }}" class="form-label fw-bold">
+                                    <i class="fas fa-comment me-2"></i>{{ form.reason.label }}
+                                </label>
+                                {{ form.reason }}
+                                {% if form.reason.help_text %}
+                                <div class="form-text">{{ form.reason.help_text }}</div>
+                                {% endif %}
+                                {% if form.reason.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.reason.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-info-circle me-2"></i>Flagging Guidelines</h6>
+                                <ul class="mb-0">
+                                    <li>Provide specific reasons why you believe this profile is fake</li>
+                                    <li>Include any suspicious patterns or behaviors you've observed</li>
+                                    <li>Be as detailed as possible to help with the review process</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-warning btn-custom me-3">
+                                    <i class="fas fa-flag me-2"></i>Flag Profile
+                                </button>
+                    <a href="{% url 'detection_app:admin_dashboard' %}" class="btn btn-secondary btn-custom">
+                        <i class="fas fa-arrow-left me-2"></i>Cancel
+                    </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

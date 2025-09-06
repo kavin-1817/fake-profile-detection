@@ -1,0 +1,220 @@
+{% extends 'detection_app/base.html' %}
+
+{% block title %}Detection Result - Fake Profile Detection{% endblock %}
+
+{% block content %}
+<!-- Result Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Result Card -->
+                <div class="card result-card {% if is_fake %}fake-result{% else %}genuine-result{% endif %}">
+                    <div class="text-center">
+                        <div class="mb-4">
+                            {% if is_fake %}
+                                <i class="fas fa-exclamation-triangle" style="font-size: 4rem;"></i>
+                            {% else %}
+                                <i class="fas fa-check-circle" style="font-size: 4rem;"></i>
+                            {% endif %}
+                        </div>
+                        
+                        <h1 class="display-4 fw-bold mb-3">{{ result }}</h1>
+                        
+                        <div class="mb-4">
+                            <h3 class="mb-3">Confidence Score</h3>
+                            <div class="confidence-bar mx-auto" style="width: 300px;">
+                                <div class="confidence-fill bg-white" style="width: {{ confidence }}%;"></div>
+                            </div>
+                            <p class="mt-2 mb-0 fs-4 fw-bold">{{ confidence|floatformat:1 }}%</p>
+                        </div>
+                        
+                        <div class="row text-center mt-4">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-robot me-2"></i>Model Used</h5>
+                                <p class="mb-0">Advanced ML Algorithm</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-clock me-2"></i>Analysis Time</h5>
+                                <p class="mb-0">< 1 second</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Profile Details -->
+                <div class="card mt-4">
+                    <div class="card-header bg-dark text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-user me-2"></i>Profile Details
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Bio Text</h6>
+                                <p class="mb-3">{{ profile.bio|truncatewords:20 }}</p>
+                                
+                                <h6 class="text-muted">Friends Count</h6>
+                                <p class="mb-3">{{ profile.friends_count }}</p>
+                                
+                                <h6 class="text-muted">Posts per Week</h6>
+                                <p class="mb-3">{{ profile.posts_per_week }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Account Age</h6>
+                                <p class="mb-3">{{ profile.account_age_days }} days</p>
+                                
+                                <h6 class="text-muted">Verified Account</h6>
+                                <p class="mb-3">
+                                    {% if profile.verified %}
+                                        <span class="badge bg-success">Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </p>
+                                
+                                <h6 class="text-muted">Profile Picture</h6>
+                                <p class="mb-3">
+                                    {% if profile.profile_picture %}
+                                        <span class="badge bg-success">Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Analysis Features -->
+                <div class="card mt-4">
+                    <div class="card-header bg-info text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-chart-line me-2"></i>Analysis Features
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="text-center">
+                                    <i class="fas fa-language text-primary" style="font-size: 2rem;"></i>
+                                    <h6 class="mt-2">NLP Analysis</h6>
+                                    <small class="text-muted">Text processing and sentiment analysis</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="text-center">
+                                    <i class="fas fa-users text-success" style="font-size: 2rem;"></i>
+                                    <h6 class="mt-2">Social Metrics</h6>
+                                    <small class="text-muted">Friends count and posting patterns</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="text-center">
+                                    <i class="fas fa-calendar text-warning" style="font-size: 2rem;"></i>
+                                    <h6 class="mt-2">Account History</h6>
+                                    <small class="text-muted">Account age and verification status</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="text-center mt-4">
+                    <a href="{% url 'detection_app:index' %}" class="btn btn-primary btn-custom me-3">
+                        <i class="fas fa-plus me-2"></i>Analyze Another Profile
+                    </a>
+                    
+                    {% if user.is_staff %}
+                    <a href="{% url 'detection_app:flag_profile' profile.id %}" class="btn btn-warning btn-custom me-3">
+                        <i class="fas fa-flag me-2"></i>Flag for Review
+                    </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'detection_app:admin_dashboard' %}" class="btn btn-secondary btn-custom">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Explanation Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card">
+                    <div class="card-header bg-dark text-white text-center">
+                        <h3 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            How This Analysis Works
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-language text-primary me-2"></i>Text Analysis</h5>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>Spam word detection</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Sentiment analysis</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Linguistic patterns</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Character frequency analysis</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-chart-bar text-success me-2"></i>Behavioral Analysis</h5>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>Posting frequency patterns</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Social network size analysis</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Account age verification</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Profile completeness check</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info mt-4">
+                            <h6><i class="fas fa-lightbulb me-2"></i>Important Note</h6>
+                            <p class="mb-0">
+                                This analysis is based on machine learning algorithms and should be used as a tool to assist in decision-making. 
+                                Always verify suspicious profiles through additional means before taking action.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate confidence bar
+        const confidenceBar = document.querySelector('.confidence-fill');
+        if (confidenceBar) {
+            const width = confidenceBar.style.width;
+            confidenceBar.style.width = '0%';
+            setTimeout(() => {
+                confidenceBar.style.width = width;
+            }, 500);
+        }
+        
+        // Add some visual feedback
+        const resultCard = document.querySelector('.result-card');
+        if (resultCard) {
+            resultCard.style.transform = 'scale(0.9)';
+            resultCard.style.opacity = '0';
+            setTimeout(() => {
+                resultCard.style.transition = 'all 0.5s ease';
+                resultCard.style.transform = 'scale(1)';
+                resultCard.style.opacity = '1';
+            }, 100);
+        }
+    });
+</script>
+{% endblock %}
