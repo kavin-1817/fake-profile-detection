@@ -82,7 +82,7 @@ def extract_text_features(text):
         'spam_words': spam_word_count
     }
 
-def predict_profile(bio, friends_count, posts_per_week, account_age_days=0, verified=False, profile_pic=True):
+def predict_profile(bio, friends_count, total_posts, account_age_days=0, verified=False, profile_pic=True):
     """Predict if a profile is fake using the ML model"""
     model_data = load_model()
     
@@ -99,7 +99,7 @@ def predict_profile(bio, friends_count, posts_per_week, account_age_days=0, veri
         # Prepare numeric features
         numeric_features = np.array([[
             friends_count,
-            posts_per_week,
+            total_posts,
             account_age_days,
             int(verified),
             int(profile_pic),
@@ -140,14 +140,14 @@ def index(request):
             # Get form data
             bio = form.cleaned_data['bio']
             friends_count = form.cleaned_data['friends_count']
-            posts_per_week = form.cleaned_data['posts_per_week']
+            total_posts = form.cleaned_data['total_posts']
             account_age_days = form.cleaned_data.get('account_age_days', 0)
             verified = form.cleaned_data.get('verified', False)
             profile_pic = form.cleaned_data.get('profile_picture', True)
             
             # Make prediction
             prediction, confidence, error = predict_profile(
-                bio, friends_count, posts_per_week, account_age_days, verified, profile_pic
+                bio, friends_count, total_posts, account_age_days, verified, profile_pic
             )
             
             if prediction is not None:
@@ -155,7 +155,7 @@ def index(request):
                 profile = Profile.objects.create(
                     bio=bio,
                     friends_count=friends_count,
-                    posts_per_week=posts_per_week,
+                    total_posts=total_posts,
                     account_age_days=account_age_days,
                     verified=verified,
                     profile_picture=profile_pic
@@ -170,7 +170,7 @@ def index(request):
                     features_used={
                         'text_length': len(bio),
                         'friends_count': friends_count,
-                        'posts_per_week': posts_per_week,
+                        'total_posts': total_posts,
                         'account_age_days': account_age_days,
                         'verified': verified,
                         'profile_picture': profile_pic

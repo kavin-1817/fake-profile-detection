@@ -128,106 +128,16 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Django specific
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Media files
-media/
-
-# Static files
-staticfiles/
-static/
-
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# IDE files
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
-# OS generated files
+# OS
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
-# Machine Learning models (optional - uncomment if you don't want to track models)
-# *.pkl
-# *.joblib
-# *.h5
-# *.hdf5
-
-# Temporary files
-*.tmp
-*.temp
-
-# Logs
-logs/
-*.log
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# Node modules (if using any frontend build tools)
-node_modules/
-
-# Coverage reports
-htmlcov/
-.coverage
-.coverage.*
-coverage.xml
-
-# pytest
-.pytest_cache/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# pyenv
-.python-version
-
-# pipenv
-Pipfile.lock
-
-# PEP 582
-__pypackages__/
-
-# Celery
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath
-*.sage.py
-
-# Spyder
-.spyderproject
-.spyproject
-
-# Rope
-.ropeproject
-
-# mkdocs
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre
-.pyre/
+# Project specific
+ml_model.pkl
+*.pkl

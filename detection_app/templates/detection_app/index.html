@@ -95,16 +95,16 @@
                                 
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="{{ form.posts_per_week.id_for_label }}" class="form-label">
-                                            <i class="fas fa-paper-plane"></i>{{ form.posts_per_week.label }}
+                                        <label for="{{ form.total_posts.id_for_label }}" class="form-label">
+                                            <i class="fas fa-paper-plane"></i>{{ form.total_posts.label }}
                                         </label>
-                                        {{ form.posts_per_week }}
-                                        {% if form.posts_per_week.help_text %}
-                                        <div class="form-text">{{ form.posts_per_week.help_text }}</div>
+                                        {{ form.total_posts }}
+                                        {% if form.total_posts.help_text %}
+                                        <div class="form-text">{{ form.total_posts.help_text }}</div>
                                         {% endif %}
-                                        {% if form.posts_per_week.errors %}
+                                        {% if form.total_posts.errors %}
                                         <div class="text-danger small mt-1">
-                                            {% for error in form.posts_per_week.errors %}{{ error }}{% endfor %}
+                                            {% for error in form.total_posts.errors %}{{ error }}{% endfor %}
                                         </div>
                                         {% endif %}
                                     </div>
@@ -131,18 +131,20 @@
                                             <i class="fas fa-cog"></i>Additional Features
                                         </label>
                                         
-                                        <div class="form-check">
-                                            {{ form.verified }}
-                                            <label class="form-check-label" for="{{ form.verified.id_for_label }}">
-                                                <i class="fas fa-check-circle"></i>{{ form.verified.label }}
-                                            </label>
-                                        </div>
-                                        
-                                        <div class="form-check">
-                                            {{ form.profile_picture }}
-                                            <label class="form-check-label" for="{{ form.profile_picture.id_for_label }}">
-                                                <i class="fas fa-image"></i>{{ form.profile_picture.label }}
-                                            </label>
+                                        <div class="checkbox-container">
+                                            <div class="form-check">
+                                                {{ form.verified }}
+                                                <label class="form-check-label" for="{{ form.verified.id_for_label }}">
+                                                    <i class="fas fa-check-circle"></i>{{ form.verified.label }}
+                                                </label>
+                                            </div>
+                                            
+                                            <div class="form-check">
+                                                {{ form.profile_picture }}
+                                                <label class="form-check-label" for="{{ form.profile_picture.id_for_label }}">
+                                                    <i class="fas fa-image"></i>{{ form.profile_picture.label }}
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -389,48 +391,126 @@
     }
 
     /* Enhanced Checkbox Styling */
+    .checkbox-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
     .form-check {
-        padding: 1rem;
-        background: rgba(102, 126, 234, 0.05);
-        border-radius: 15px;
-        margin-bottom: 1rem;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
+        padding: 1.25rem 1.5rem;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 20px;
+        margin-bottom: 0;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid rgba(102, 126, 234, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-check::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--primary-gradient);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
     }
 
     .form-check:hover {
-        background: rgba(102, 126, 234, 0.1);
-        border-color: rgba(102, 126, 234, 0.2);
-        transform: translateY(-2px);
+        background: rgba(102, 126, 234, 0.08);
+        border-color: rgba(102, 126, 234, 0.3);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+    }
+
+    .form-check:hover::before {
+        transform: scaleX(1);
     }
 
     .form-check-input {
-        width: 1.5rem;
-        height: 1.5rem;
-        border-radius: 50%;
+        width: 1.75rem;
+        height: 1.75rem;
+        border-radius: 8px;
         border: 2px solid #e9ecef;
-        transition: all 0.3s ease;
-        margin-top: 0.1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin: 0;
+        position: relative;
+        background: white;
+        cursor: pointer;
     }
 
     .form-check-input:checked {
         background: var(--primary-gradient);
         border-color: transparent;
         transform: scale(1.1);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .form-check-input:checked::after {
+        content: '✓';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-weight: bold;
+        font-size: 1rem;
+    }
+
+    .form-check-input:focus {
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        outline: none;
     }
 
     .form-check-label {
-        font-weight: 600;
+        font-weight: 700;
         color: #2c3e50;
         cursor: pointer;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.75rem;
+        flex: 1;
+        font-size: 1.05rem;
+        line-height: 1.4;
     }
 
     .form-check-label i {
         color: #667eea;
-        font-size: 1.1rem;
+        font-size: 1.2rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    .form-check-label:hover {
+        color: #667eea;
+    }
+
+    /* Checkbox Animation */
+    .form-check-input:not(:checked) {
+        animation: pulse-unchecked 2s infinite;
+    }
+
+    @keyframes pulse-unchecked {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+        50% { box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1); }
+    }
+
+    .form-check-input:checked {
+        animation: pulse-checked 0.6s ease-out;
+    }
+
+    @keyframes pulse-checked {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1.1); }
     }
 
     /* Feature Cards Enhancement */
@@ -603,6 +683,19 @@
         .stats-card h3 {
             font-size: 2.5rem;
         }
+        
+        .form-check {
+            padding: 1rem 1.25rem;
+        }
+        
+        .form-check-input {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+        
+        .form-check-label {
+            font-size: 1rem;
+        }
     }
 
     @media (max-width: 576px) {
@@ -627,6 +720,30 @@
         
         .stats-card h3 {
             font-size: 2rem;
+        }
+        
+        .checkbox-container {
+            gap: 0.75rem;
+        }
+        
+        .form-check {
+            padding: 0.875rem 1rem;
+            gap: 0.75rem;
+        }
+        
+        .form-check-input {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+        
+        .form-check-label {
+            font-size: 0.95rem;
+            gap: 0.5rem;
+        }
+        
+        .form-check-label i {
+            font-size: 1rem;
+            width: 16px;
         }
     }
 </style>

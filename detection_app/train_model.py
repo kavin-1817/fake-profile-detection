@@ -42,16 +42,16 @@ def create_synthetic_dataset():
     # Fake profiles
     fake_profiles = [
         # Spam and promotional accounts
-        {"bio": "CLICK HERE TO WIN $1000!!! FREE MONEY!!! NO SCAM!!!", "friends": 5, "posts": 50, "age_days": 10, "verified": False, "profile_pic": False},
-        {"bio": "Make money fast! Work from home! Earn $5000 per week! DM me now!", "friends": 2, "posts": 30, "age_days": 5, "verified": False, "profile_pic": False},
-        {"bio": "FREE BITCOIN!!! INVEST NOW!!! GUARANTEED PROFITS!!!", "friends": 1, "posts": 25, "age_days": 3, "verified": False, "profile_pic": False},
-        {"bio": "Hot singles in your area! Click now! Adult content!", "friends": 0, "posts": 40, "age_days": 7, "verified": False, "profile_pic": False},
-        {"bio": "FOLLOW FOR FOLLOW!!! LIKE FOR LIKE!!! INSTANT FOLLOWERS!!!", "friends": 50, "posts": 100, "age_days": 15, "verified": False, "profile_pic": True},
-        {"bio": "Buy followers! Buy likes! Social media marketing services!", "friends": 20, "posts": 60, "age_days": 20, "verified": False, "profile_pic": False},
-        {"bio": "WIN IPHONE 15!!! CLICK LINK!!! VERIFY ACCOUNT!!!", "friends": 3, "posts": 35, "age_days": 8, "verified": False, "profile_pic": False},
-        {"bio": "Crypto investment opportunity! 1000% returns! Join our group!", "friends": 8, "posts": 45, "age_days": 12, "verified": False, "profile_pic": False},
-        {"bio": "URGENT!!! HELP NEEDED!!! SEND MONEY!!! FAMILY EMERGENCY!!!", "friends": 1, "posts": 20, "age_days": 4, "verified": False, "profile_pic": False},
-        {"bio": "Get rich quick scheme! Pyramid marketing! Join now!", "friends": 15, "posts": 55, "age_days": 25, "verified": False, "profile_pic": True},
+        {"bio": "CLICK HERE TO WIN $1000!!! FREE MONEY!!! NO SCAM!!!", "friends": 5, "total_posts": 50, "age_days": 10, "verified": False, "profile_pic": False},
+        {"bio": "Make money fast! Work from home! Earn $5000 per week! DM me now!", "friends": 2, "total_posts": 30, "age_days": 5, "verified": False, "profile_pic": False},
+        {"bio": "FREE BITCOIN!!! INVEST NOW!!! GUARANTEED PROFITS!!!", "friends": 1, "total_posts": 25, "age_days": 3, "verified": False, "profile_pic": False},
+        {"bio": "Hot singles in your area! Click now! Adult content!", "friends": 0, "total_posts": 40, "age_days": 7, "verified": False, "profile_pic": False},
+        {"bio": "FOLLOW FOR FOLLOW!!! LIKE FOR LIKE!!! INSTANT FOLLOWERS!!!", "friends": 50, "total_posts": 100, "age_days": 15, "verified": False, "profile_pic": True},
+        {"bio": "Buy followers! Buy likes! Social media marketing services!", "friends": 20, "total_posts": 60, "age_days": 20, "verified": False, "profile_pic": False},
+        {"bio": "WIN IPHONE 15!!! CLICK LINK!!! VERIFY ACCOUNT!!!", "friends": 3, "total_posts": 35, "age_days": 8, "verified": False, "profile_pic": False},
+        {"bio": "Crypto investment opportunity! 1000% returns! Join our group!", "friends": 8, "total_posts": 45, "age_days": 12, "verified": False, "profile_pic": False},
+        {"bio": "URGENT!!! HELP NEEDED!!! SEND MONEY!!! FAMILY EMERGENCY!!!", "friends": 1, "total_posts": 20, "age_days": 4, "verified": False, "profile_pic": False},
+        {"bio": "Get rich quick scheme! Pyramid marketing! Join now!", "friends": 15, "total_posts": 55, "age_days": 25, "verified": False, "profile_pic": True},
     ]
     
     # Create more variations
@@ -78,7 +78,7 @@ def create_synthetic_dataset():
         all_profiles.append({
             "bio": genuine_variations[i % len(genuine_variations)],
             "friends": np.random.randint(200, 2000),
-            "posts": np.random.randint(1, 10),
+            "total_posts": np.random.randint(50, 500),
             "age_days": np.random.randint(500, 3000),
             "verified": np.random.choice([True, False], p=[0.1, 0.9]),
             "profile_pic": True,
@@ -96,7 +96,7 @@ def create_synthetic_dataset():
         all_profiles.append({
             "bio": fake_variations[i % len(fake_variations)],
             "friends": np.random.randint(0, 50),
-            "posts": np.random.randint(20, 100),
+            "total_posts": np.random.randint(20, 100),
             "age_days": np.random.randint(1, 30),
             "verified": False,
             "profile_pic": np.random.choice([True, False], p=[0.3, 0.7]),
@@ -169,12 +169,15 @@ def train_models():
     
     # Prepare features
     X_text = data['bio_processed']
-    X_numeric = data[['friends', 'posts', 'age_days']].copy()
+    X_numeric = data[['friends', 'total_posts', 'age_days']].copy()
     X_numeric['verified'] = data['verified'].astype(int)
     X_numeric['profile_pic'] = data['profile_pic'].astype(int)
     
     # Add extracted text features
     X_numeric = pd.concat([X_numeric, text_features_df], axis=1)
+    
+    # Clean data - replace NaN values
+    X_numeric = X_numeric.fillna(0)
     
     y = data['label']
     
@@ -187,11 +190,11 @@ def train_models():
         min_df=2
     )
     X_text_features = vectorizer.fit_transform(X_text)
-    
+
     # Combine all features
     from scipy.sparse import hstack
     X_combined = hstack([X_text_features, X_numeric.values])
-    
+
     # Train-test split
     X_train, X_test, y_train, y_test = train_test_split(
         X_combined, y, test_size=0.2, random_state=42, stratify=y

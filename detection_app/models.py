@@ -7,7 +7,7 @@ class Profile(models.Model):
     """Model to store user profile information"""
     bio = models.TextField(help_text="Profile bio text")
     friends_count = models.PositiveIntegerField(help_text="Number of friends/followers")
-    posts_per_week = models.PositiveIntegerField(help_text="Average posts per week")
+    total_posts = models.PositiveIntegerField(default=0, help_text="Total number of posts")
     account_age_days = models.PositiveIntegerField(default=0, help_text="Account age in days")
     profile_picture = models.BooleanField(default=True, help_text="Has profile picture")
     verified = models.BooleanField(default=False, help_text="Is verified account")

@@ -3,7 +3,7 @@ from .models import Profile, DetectionResult, ModelMetrics, FlaggedProfile
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ['id', 'bio_preview', 'friends_count', 'posts_per_week', 'account_age_days', 'verified', 'created_at']
+    list_display = ['id', 'bio_preview', 'friends_count', 'total_posts', 'account_age_days', 'verified', 'created_at']
     list_filter = ['verified', 'profile_picture', 'created_at']
     search_fields = ['bio']
     readonly_fields = ['created_at']

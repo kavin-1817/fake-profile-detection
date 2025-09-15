@@ -6,7 +6,7 @@ class ProfileForm(forms.ModelForm):
     
     class Meta:
         model = Profile
-        fields = ['bio', 'friends_count', 'posts_per_week', 'account_age_days', 'verified', 'profile_picture']
+        fields = ['bio', 'friends_count', 'total_posts', 'account_age_days', 'verified', 'profile_picture']
         widgets = {
             'bio': forms.Textarea(attrs={
                 'class': 'form-control',
@@ -20,9 +20,9 @@ class ProfileForm(forms.ModelForm):
                 'min': 0,
                 'required': True
             }),
-            'posts_per_week': forms.NumberInput(attrs={
+            'total_posts': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Average posts per week',
+                'placeholder': 'Total number of posts',
                 'min': 0,
                 'required': True
             }),
@@ -42,7 +42,7 @@ class ProfileForm(forms.ModelForm):
         labels = {
             'bio': 'Profile Bio',
             'friends_count': 'Friends/Followers Count',
-            'posts_per_week': 'Posts per Week',
+            'total_posts': 'Total Number of Posts',
             'account_age_days': 'Account Age (Days)',
             'verified': 'Verified Account',
             'profile_picture': 'Has Profile Picture'
@@ -50,7 +50,7 @@ class ProfileForm(forms.ModelForm):
         help_texts = {
             'bio': 'Enter the profile bio text to analyze',
             'friends_count': 'Number of friends or followers',
-            'posts_per_week': 'Average number of posts per week',
+            'total_posts': 'Total number of posts made by the profile',
             'account_age_days': 'Age of the account in days (optional)',
             'verified': 'Check if this is a verified account',
             'profile_picture': 'Check if the profile has a picture'
