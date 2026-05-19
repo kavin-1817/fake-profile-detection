@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-3o%m0+pgdx=u=nhirbl-h&#e8q-*ecy5tk7zf#h#+l9xsil(i_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["fake-profile-detection-phi.vercel.app"]
 
 
 # Application definition
